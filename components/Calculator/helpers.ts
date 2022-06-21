@@ -24,7 +24,6 @@ const setActionAdd = ({
 }: IOperationActionProps) => {
   handleAddAnimationSpan(String(item.display), expElement);
 
-  console.log(expression);
   const operator = item.display !== "x" ? item.display : "*";
   setExpression(expression + operator);
 };
@@ -73,8 +72,6 @@ const setActionCalc = ({
       cloneNode.style.transform = transform;
       cloneNode.innerHTML = "Not a number";
     }, 200);
-  } finally {
-    console.log("calc complete");
   }
 };
 
