@@ -12,7 +12,6 @@ exports[`<Calculator> should render the calculator 1`] = `
         aria-label="Result"
         class="sc-b5fa8bf3-2 jPTnNe calculator__result__exp"
         data-testid="calculatorResult"
-        data-value=""
         role="input"
       />
       <div

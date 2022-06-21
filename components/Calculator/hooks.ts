@@ -26,7 +26,6 @@ export const useCalculator = () => {
   };
 
   return {
-    expression,
     darkTheme,
     expressionRef,
     handleInputAction,

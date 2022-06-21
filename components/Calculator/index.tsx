@@ -14,8 +14,7 @@ import {
 const { useRef, useEffect, useCallback } = React;
 
 const Calculator: React.FC = () => {
-  const { expressionRef, handleInputAction, darkTheme, expression } =
-    useCalculator();
+  const { expressionRef, handleInputAction, darkTheme } = useCalculator();
 
   const buttonsRef = useRef<HTMLInputElement>(null);
 
@@ -57,7 +56,6 @@ const Calculator: React.FC = () => {
           role="input"
           className="calculator__result__exp"
           aria-label="Result"
-          data-value={expression}
         />
 
         <Exp

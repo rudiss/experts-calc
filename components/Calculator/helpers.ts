@@ -71,7 +71,7 @@ const setActionCalc = ({
   } catch {
     setTimeout(() => {
       cloneNode.style.transform = transform;
-      cloneNode.innerHTML = "Syntax error";
+      cloneNode.innerHTML = "Not a number";
     }, 200);
   } finally {
     console.log("calc complete");
