@@ -49,10 +49,11 @@ export const Exp = styled.div`
   }
 `;
 
-export const Buttons = styled.div`
+export const ButtonsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
+  opacity: 0;
 
   button {
     border: 0;

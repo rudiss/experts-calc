@@ -1,130 +1,93 @@
 import Image from "next/image";
-import React, { useRef, useEffect, useState } from "react";
-import {
-  buttonsOptions,
-  BTN_ACTIONS,
-	buttonOptionType,
-} from "./buttonActions";
+import * as React from "react";
+import { buttonOptionType } from "./types";
+import { buttonsOptions } from "./data";
+import { useCalculator } from "./hooks";
 
-import { Container, Result, Exp, Buttons } from "./styles";
+import { Container, Result, Exp, ButtonsContainer } from "./styles";
+import {
+  CALCULATOR_BUTTONS_TEST_ID,
+  CALCULATOR_EXPRESSION_TEST_ID,
+  CALCULATOR_RESULT_TEST_ID,
+} from "./constants";
+
+const { useRef, useEffect, useCallback } = React;
 
 const Calculator: React.FC = () => {
-  const buttonsRef = useRef<HTMLInputElement | any>(null);
-  const expRef = useRef<HTMLInputElement | any>(null);
+  const { expressionRef, handleInputAction, darkTheme, expression } =
+    useCalculator();
 
-  const [expression, setExpression] = useState<string>("");
-	const [darkTheme, setDarkTheme] = useState<Boolean>(false);
+  const buttonsRef = useRef<HTMLInputElement>(null);
+
+  const handleCalculatorButtonsStyle = useCallback(
+    () =>
+      setTimeout(() => {
+        if (!buttonsRef.current) return;
+
+        const calculatorButtons: HTMLButtonElement[] = Array.from(
+          buttonsRef.current.querySelectorAll("button")
+        );
+
+        calculatorButtons.forEach(
+          (element) => (element.style.height = element.offsetWidth + "px")
+        );
+
+        buttonsRef.current.style.opacity = "1";
+      }, 250),
+    [buttonsRef]
+  );
 
   useEffect(() => {
-    const calculatorButtons: HTMLButtonElement[] = Array.from(
-			buttonsRef!.current.querySelectorAll("button")
-    );
+    handleCalculatorButtonsStyle();
+  }, [handleCalculatorButtonsStyle]);
 
-    calculatorButtons.forEach(
-      (element) => (element.style.height = element.offsetWidth + "px")
-    );
-  }, []);
-
-  const handleTheme = (item: buttonOptionType) => {
-    if (item.action === BTN_ACTIONS.THEME) {
-      document.body.classList.toggle("dark");
-    }
-    setDarkTheme(!darkTheme);
-  };
-
-	const btnClick = (item: buttonOptionType) => {
-		handleTheme(item);
-
-		const expDiv: HTMLElement | HTMLCollection | null | any = expRef.current;
-
-    if (item.action === BTN_ACTIONS.ADD) {
-      addAnimSpan(item.display as string);
-
-      const operator = item.display !== "x" ? item.display : "*";
-      setExpression(expression + operator);
-    }
-
-    if (item.action === BTN_ACTIONS.DELETE) {
-			expDiv!.parentNode.querySelector("div:last-child").innerHTML = "";
-      expDiv!.innerHTML = "";
-
-      setExpression("");
-    }
-
-    if (item.action === BTN_ACTIONS.CALC) {
-      if (expression.trim().length <= 0) return;
-
-      expDiv?.parentNode.querySelector("div:last-child").remove();
-
-      const cloneNode = expDiv?.cloneNode(true);
-      expDiv?.parentNode.appendChild(cloneNode);
-
-      const transform = `translateY(${
-        -(expDiv?.offsetHeight + 10) + "px"
-      }) scale(0.4)`;
-
-      try {
-        let res = eval(expression);
-
-        setExpression(res.toString());
-        setTimeout(() => {
-          cloneNode.style.transform = transform;
-          expDiv!.innerHTML = "";
-          addAnimSpan((Math.floor(res * 100000000) / 100000000) as any);
-        }, 200);
-      } catch {
-        setTimeout(() => {
-          cloneNode.style.transform = transform;
-          cloneNode.innerHTML = "Syntax error";
-        }, 200);
-      } finally {
-        console.log("calc complete");
-      }
-    }
-  };
-
-	const addAnimSpan = (content: string) => {
-    const expDiv = expRef.current;
-    const span = document.createElement("span");
-
-    span.innerHTML = content;
-    span.style.opacity = "0";
-    expDiv?.appendChild(span);
-
-    const width = span.offsetWidth + "px";
-    span.style.width = "0";
-
-    setTimeout(() => {
-      span.style.opacity = "1";
-      span.style.width = width;
-    }, 100);
-  };
+  const handleCLickItem = useCallback(
+    (item: buttonOptionType) => {
+      handleInputAction(item);
+    },
+    [handleInputAction]
+  );
 
   return (
     <Container>
       <Result className="calculator__result">
-        <Exp ref={expRef} className="calculator__result__exp" />
-        <Exp className="calculator__result__exp" />
+        <Exp
+          ref={expressionRef}
+          data-testid={CALCULATOR_RESULT_TEST_ID}
+          role="input"
+          className="calculator__result__exp"
+          aria-label="Result"
+          data-value={expression}
+        />
+
+        <Exp
+          className="calculator__result__exp"
+          data-testid={CALCULATOR_EXPRESSION_TEST_ID}
+        />
       </Result>
-      <Buttons ref={buttonsRef} className="calculator__btns">
-        {buttonsOptions.map((item, index) => (
+      <ButtonsContainer
+        ref={buttonsRef}
+        data-testid={CALCULATOR_BUTTONS_TEST_ID}
+        className="calculator__btns"
+      >
+        {buttonsOptions.map((button, index) => (
           <button
             key={index}
-            className={item.class}
-            onClick={() => btnClick(item)}
+            className={button.class}
+            onClick={() => handleCLickItem(button)}
           >
-            {item.display !== "sun.svg" && item.display}
-            {item.display === "sun.svg" && (
+            {button.display !== "sun.svg" && button.display}
+            {button.display === "sun.svg" && (
               <Image
                 src={`/${!darkTheme ? "moon.png" : "sun.png"}`}
-                alt={item.display}
+                alt={button.display}
                 width={16}
                 height={16}
               />
             )}
           </button>
         ))}
-      </Buttons>
+      </ButtonsContainer>
     </Container>
   );
 };
